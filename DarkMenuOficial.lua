@@ -21,6 +21,7 @@ local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
+local Debris = game:GetService("Debris")
 
 -- [[ CONSTANTS ]]
 local LocalPlayer = Players.LocalPlayer
@@ -618,6 +619,15 @@ local function ToggleUI(state)
     if state == nil then state = not DarkMenu.UI.Visible end
     DarkMenu.UI.Visible = state
     
+    -- Background Blur Effect
+    local blur = Lighting:FindFirstChild("DarkMenuBlur")
+    if not blur then
+        blur = Instance.new("BlurEffect")
+        blur.Name = "DarkMenuBlur"
+        blur.Size = 0
+        blur.Parent = Lighting
+    end
+
     if state then
         Main.Visible = true
         MiniBtn.Visible = false
@@ -625,9 +635,11 @@ local function ToggleUI(state)
         Main.GroupTransparency = 1
         Utils:Tween(MainScale, TweenInfo.new(0.6, Enum.EasingStyle.Exponential, Enum.EasingDirection.Out), {Scale = 1})
         Utils:Tween(Main, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {GroupTransparency = 0})
+        Utils:Tween(blur, TweenInfo.new(0.5), {Size = 15})
     else
         Utils:Tween(MainScale, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Scale = 0.9})
         Utils:Tween(Main, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {GroupTransparency = 1})
+        Utils:Tween(blur, TweenInfo.new(0.4), {Size = 0})
         task.delay(0.4, function() if not DarkMenu.UI.Visible then Main.Visible = false MiniBtn.Visible = true end end)
     end
 end
@@ -689,6 +701,15 @@ SubTitle.TextColor3 = DarkMenu.UI.AccentColor
 SubTitle.TextSize = 11
 SubTitle.TextXAlignment = Enum.TextXAlignment.Left
 SubTitle.Parent = Header
+
+-- Pulsing Text Animation
+task.spawn(function()
+    while task.wait(1.5) do
+        Utils:Tween(SubTitle, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {TextColor3 = Color3.fromRGB(255, 255, 255)})
+        task.wait(1.5)
+        Utils:Tween(SubTitle, TweenInfo.new(1.5, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {TextColor3 = DarkMenu.UI.AccentColor})
+    end
+end)
 
 -- Divider under header
 local HDiv = Instance.new("Frame")
