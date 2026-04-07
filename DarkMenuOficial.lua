@@ -22,6 +22,7 @@ local Lighting = game:GetService("Lighting")
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 local Debris = game:GetService("Debris")
+local VirtualUser = game:GetService("VirtualUser")
 
 -- [[ CONSTANTS ]]
 local LocalPlayer = Players.LocalPlayer
@@ -729,6 +730,9 @@ local TabLayout = Instance.new("UIListLayout", TabHolder)
 TabLayout.Padding = UDim.new(0, 2)
 TabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
+local Tabs = {}
+local CurrentPage = nil
+
 -- Main Content Area
 local Content = Instance.new("Frame")
 Content.Size = UDim2.new(1, -228, 1, -20)
@@ -789,7 +793,7 @@ function Lib:CreateTab(name, icon)
         end
     end)
 
-    Btn.MouseButton1Click:Connect(function()
+    local function Select()
         if CurrentPage then
             CurrentPage.Visible = false
             for _, t in pairs(Tabs) do
@@ -804,9 +808,11 @@ function Lib:CreateTab(name, icon)
         Utils:Tween(Btn, TweenInfo.new(0.25), {TextColor3 = DarkMenu.UI.TextColor, BackgroundTransparency = 0.9, BackgroundColor3 = DarkMenu.UI.ItemColor})
         Btn.Font = Enum.Font.GothamBold
         Utils:Tween(AccentBar, TweenInfo.new(0.25), {BackgroundTransparency = 0})
-    end)
+    end
+
+    Btn.MouseButton1Click:Connect(Select)
     
-    Tabs[name] = {Btn = Btn, Page = Page}
+    Tabs[name] = {Btn = Btn, Page = Page, Select = Select}
     return Page
 end
 
@@ -2227,8 +2233,12 @@ DarkMenu.Connections.Noclip = RunService.Stepped:Connect(function()
     end
 end)
 
--- Default Tab
-Tabs["Player"].Btn.MouseButton1Click:Fire()
+-- Default Tab Selection
+task.defer(function()
+    if Tabs["Assist"] and Tabs["Assist"].Select then
+        Tabs["Assist"].Select()
+    end
+end)
 
 -- Final Execution Log
 print("[DarkMenu] Supreme Edition Carregada com Sucesso!")
