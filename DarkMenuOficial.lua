@@ -29,6 +29,14 @@ local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 local Mouse = LocalPlayer:GetMouse()
 
+-- [[ CORE UI CONTAINER ]]
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "DarkMenu_Premium"
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.ResetOnSpawn = false
+getgenv().DarkMenuExecuted = ScreenGui
+
 -- [[ STATE MANAGEMENT ]]
 local DarkMenu = {
     Settings = {
@@ -448,7 +456,6 @@ function Utils:LoadConfig()
 end
 
 -- [[ UI INITIALIZATION ]]
-local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "DarkMenu_v18"
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 ScreenGui.IgnoreGuiInset = true
@@ -720,7 +727,10 @@ HDiv.BackgroundColor3 = DarkMenu.UI.BorderColor
 HDiv.BorderSizePixel = 0
 HDiv.Parent = Header
 
--- Tab Container
+-- [[ UI STATE & CONTAINERS ]]
+local Tabs = {}
+local CurrentPage = nil
+
 local TabHolder = Instance.new("Frame")
 TabHolder.Size = UDim2.new(1, 0, 1, -240)
 TabHolder.Position = UDim2.new(0, 0, 0, 100)
@@ -730,10 +740,6 @@ local TabLayout = Instance.new("UIListLayout", TabHolder)
 TabLayout.Padding = UDim.new(0, 2)
 TabLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
-local Tabs = {}
-local CurrentPage = nil
-
--- Main Content Area
 local Content = Instance.new("Frame")
 Content.Size = UDim2.new(1, -228, 1, -20)
 Content.Position = UDim2.new(0, 220, 0, 10)
@@ -742,8 +748,6 @@ Content.Parent = Main
 
 -- [[ UI LIBRARY ]]
 local Lib = {}
-local Tabs = {}
-local CurrentPage = nil
 
 function Lib:CreateTab(name, icon)
     local Btn = Instance.new("TextButton")
@@ -2125,7 +2129,6 @@ DarkMenu.Connections.Aimbot = RunService.RenderStepped:Connect(function()
 end)
 
 -- Anti-AFK Implementation
-local VirtualUser = game:GetService("VirtualUser")
 LocalPlayer.Idled:Connect(function()
     if DarkMenu.Settings.Misc.AntiAFK then
         VirtualUser:CaptureController()
